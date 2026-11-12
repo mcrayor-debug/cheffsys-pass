@@ -1,13 +1,12 @@
 // =====================================================================
 // Edge Function: pass-del-dia
-// Mismo patrón que las funciones de Registro de Visitantes:
-//   verify_jwt = false, la función valida la sesión y el rol por su cuenta
+// Proyecto Supabase propio (CheffsysPass), independiente de otras apps.
+//   verify_jwt = false: la función valida la sesión y el rol por su cuenta
 //   con el cliente service_role, y deja rastro en bitácora.
 //
-// Permisos (columna roles.secciones):
-//   cheffsys_pass         → ver, copiar y compartir la contraseña de HOY
-//   cheffsys_pass_fechas  → además, consultar otras fechas
-//   superadmin            → todo
+// Roles (tabla perfiles.rol):
+//   soporte → ver, copiar y compartir la contraseña de HOY
+//   admin   → además, consultar otras fechas
 //
 // Acciones (POST JSON):
 //   { accion: "obtener", fecha?: "YYYY-MM-DD" }
@@ -17,7 +16,7 @@ import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.4
 import { FECHA_RE, hoyCDMX, segmentosDelDia } from "./formula.ts";
 
 // Orígenes permitidos separados por coma, p. ej. "https://pass.cheffsys.com,http://localhost:8787".
-// Variable propia para no alterar ALLOWED_ORIGIN, que usan las funciones de visitantes.
+// Sin la variable se permite cualquier origen: configurarla en producción.
 const ORIGENES = (Deno.env.get("PASS_ALLOWED_ORIGINS") ?? "")
   .split(",").map((s) => s.trim()).filter(Boolean);
 
@@ -41,7 +40,6 @@ interface Perfil {
   nombre: string;
   rol: string;
   activo: boolean;
-  roles: { secciones: string[] } | null;
 }
 
 async function usuarioActivo(req: Request, db: SupabaseClient): Promise<Perfil | null> {
@@ -50,12 +48,10 @@ async function usuarioActivo(req: Request, db: SupabaseClient): Promise<Perfil |
   const { data, error } = await db.auth.getUser(token);
   if (error || !data.user) return null;
   const { data: perfil } = await db.from("perfiles")
-    .select("id, email, nombre, rol, activo, roles(secciones)")
+    .select("id, email, nombre, rol, activo")
     .eq("id", data.user.id).maybeSingle();
   return perfil && perfil.activo ? (perfil as unknown as Perfil) : null;
 }
-
-const tiene = (p: Perfil, s: string) => p.rol === "superadmin" || (p.roles?.secciones ?? []).includes(s);
 
 Deno.serve(async (req) => {
   const h = cabeceras(req);
@@ -72,8 +68,8 @@ Deno.serve(async (req) => {
 
   const yo = await usuarioActivo(req, db);
   if (!yo) return json({ error: "Inicia sesión para continuar." }, 401);
-  if (!tiene(yo, "cheffsys_pass")) return json({ error: "Tu usuario no tiene acceso a la contraseña del día." }, 403);
-  const otrasFechas = tiene(yo, "cheffsys_pass_fechas");
+  if (yo.rol !== "admin" && yo.rol !== "soporte") return json({ error: "Tu usuario no tiene acceso a la contraseña del día." }, 403);
+  const otrasFechas = yo.rol === "admin";
 
   let p: { accion?: string; fecha?: string; tipo?: string } = {};
   try { p = await req.json(); } catch { /* cuerpo vacío */ }

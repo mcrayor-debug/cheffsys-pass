@@ -1,5 +1,5 @@
 {
-  // Cloudflare Worker solo con archivos estáticos (mismo esquema que hixsa-registro-visitantes)
+  // Cloudflare Worker "cheffsys-pass": solo archivos estáticos de ./public
   "name": "cheffsys-pass",
   "compatibility_date": "2025-10-01",
   "assets": {
