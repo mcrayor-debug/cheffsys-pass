@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contraseña del día · CheffSys</title>
+<meta name="description" content="Contraseña del día de CheffSys para el equipo de soporte.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="img/favicon.ico" sizes="16x16">
+<link rel="icon" href="img/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="img/icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="portada">
+  <div class="banner" role="img" aria-label="Punto de venta CheffSys"></div>
+  <button class="salir" id="salir" hidden>Cerrar sesión</button>
+  <div class="identidad">
+    <img class="marca" src="img/cheffsys-marca.png" alt="" width="96" height="96">
+    <div class="titulos">
+      <img class="logo" src="img/cheffsys-texto.png" alt="CheffSys" width="134" height="34">
+      <p class="sub">Contraseña del día</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Cargando -->
+  <section id="vista-cargando" class="vista" aria-busy="true">
+    <p class="nota">Cargando…</p>
+  </section>
+
+  <!-- Inicio de sesión -->
+  <section id="vista-login" class="vista" hidden>
+    <h1>Inicia sesión</h1>
+    <p class="nota">Usa tu usuario de HIXSA.</p>
+    <form id="form-login" novalidate>
+      <label for="email">Correo</label>
+      <input id="email" type="email" autocomplete="username" inputmode="email" required>
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button class="btn primario" type="submit" id="entrar">Entrar</button>
+      <p class="error" id="error-login" role="alert"></p>
+    </form>
+  </section>
+
+  <!-- Contraseña -->
+  <section id="vista-pass" class="vista" hidden>
+    <p class="fecha" id="fecha"></p>
+
+    <div class="selector" id="selector" hidden>
+      <button class="icono" id="anterior" aria-label="Día anterior">‹</button>
+      <input type="date" id="elegir-fecha" aria-label="Elegir fecha">
+      <button class="icono" id="siguiente" aria-label="Día siguiente">›</button>
+      <button class="texto" id="hoy">Hoy</button>
+    </div>
+
+    <div class="tarjeta">
+      <p class="codigo" id="codigo" title="Toca para copiar" aria-live="polite"></p>
+      <p class="pista">Toca el número para copiarlo</p>
+    </div>
+    <p class="aviso" id="aviso-otra-fecha" hidden>No es la contraseña de hoy.</p>
+
+    <div class="acciones">
+      <button class="btn primario" id="copiar"><span class="chip"><img src="img/cheffsys-marca.png" alt="" width="26" height="26"></span>Copiar contraseña</button>
+      <button class="btn whatsapp" id="whatsapp"><svg class="wa" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 6.9L3.1 29l6.5-1.9a13.1 13.1 0 0 0 6.4 1.6c7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.4c-2 0-4-.6-5.7-1.6l-.4-.2-3.9 1.1 1.1-3.7-.3-.4a10.5 10.5 0 0 1-1.7-5.8C5.1 9.9 10 5.2 16 5.2s10.9 4.7 10.9 10.6S22 26.4 16 26.4z"/><path fill="currentColor" d="M22.1 18.6c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2l-1 1.3c-.2.2-.4.2-.7.1a8.6 8.6 0 0 1-4.3-3.7c-.3-.6.3-.5 1-1.7.1-.2 0-.4 0-.6l-1-2.5c-.3-.6-.5-.6-.8-.6h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.3 1.4 3.5c.2.2 2.4 3.7 5.8 5.1 2.2.9 3 1 4.1.8.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6l-.7-.3z"/></svg>Enviar por WhatsApp</button>
+      <button class="btn secundario" id="compartir" hidden>Compartir…</button>
+    </div>
+    <p class="estado" id="estado" role="status"></p>
+  </section>
+</main>
+
+<footer class="pie">
+  <span>Powered by</span>
+  <img src="img/logo-hixsa.webp" alt="HIXSA" width="67" height="24">
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

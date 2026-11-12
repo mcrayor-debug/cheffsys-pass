@@ -1,0 +1,137 @@
+/* Colores tomados de los logotipos de CheffSys:
+   rojo del logotipo #FF1E18, rojo del favicon #D31D1B (botones, mejor contraste), negro de la marca. */
+:root {
+  --rojo-logo: #FF1E18;
+  --rojo: #D31D1B;
+  --rojo-activo: #AE1513;
+  --negro: #0A0A0A;
+  --verde-wa: #25D366;
+  --verde-wa-activo: #1EBE5A;
+  --tinta-wa: #05301A;
+  --fondo: #FFFFFF;
+  --superficie: #F6F4F4;
+  --texto: #1C1A1B;
+  --suave: #6B6669;
+  --linea: #E6E1E2;
+  --ok: #1E7A46;
+  --banner: url("img/banner-pos4.jpg");
+  box-sizing: border-box;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { height: 100%; }
+body {
+  margin: 0; min-height: 100%;
+  display: flex; flex-direction: column;
+  background: var(--fondo); color: var(--texto);
+  font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.45;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- Portada (banner + identidad) ---------- */
+.portada { position: relative; }
+.banner {
+  height: calc(150px + env(safe-area-inset-top, 0px));
+  background: var(--negro) var(--banner) 50% 22% / cover no-repeat;
+  border-left: 6px solid var(--rojo-logo);
+}
+.salir {
+  position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: 12px;
+  font: inherit; font-size: .85rem; font-weight: 500; color: #FFFFFF;
+  background: rgba(10, 10, 10, .55); border: 0; border-radius: 999px;
+  padding: 7px 14px; cursor: pointer; backdrop-filter: blur(4px);
+}
+.identidad {
+  display: flex; align-items: flex-end; gap: 14px;
+  max-width: 520px; margin: -38px auto 0; padding: 0 20px;
+  position: relative;
+}
+.marca {
+  width: 88px; height: 88px; flex: none;
+  border-radius: 18px; background: #FFFFFF;
+  border: 3px solid #FFFFFF; box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+}
+.titulos { padding-bottom: 2px; min-width: 0; }
+.titulos .logo { display: block; height: 26px; width: auto; margin: 0 0 3px; }
+.sub { margin: 0; color: var(--suave); font-size: .9rem; line-height: 1.2; }
+
+main { flex: 1; width: 100%; max-width: 520px; margin: 0 auto; padding: 22px 20px 20px; }
+.vista[hidden] { display: none; }
+h1 { margin: 0 0 4px; font-size: 1.3rem; font-weight: 800; }
+.nota { color: var(--suave); margin: 0 0 18px; }
+
+/* ---------- Login ---------- */
+form { display: grid; gap: 8px; }
+label { font-weight: 600; font-size: .95rem; margin-top: 8px; }
+input[type=email], input[type=password] {
+  font: inherit; font-size: 1rem; height: 52px; padding: 0 14px;
+  border: 1px solid var(--linea); border-radius: 12px; background: var(--superficie); color: var(--texto);
+}
+.error { color: var(--rojo); min-height: 1.4em; margin: 6px 0 0; font-weight: 500; }
+
+/* ---------- Fecha ---------- */
+.fecha { margin: 0 0 14px; font-size: clamp(1rem, 4.6vw, 1.2rem); font-weight: 600; text-align: center; }
+.fecha::first-letter { text-transform: uppercase; }
+.selector { display: flex; gap: 8px; align-items: center; margin: 0 0 16px; }
+.selector[hidden] { display: none; }
+.selector input, .icono, .texto {
+  font: inherit; height: 42px; border: 1px solid var(--linea); border-radius: 10px;
+  background: var(--superficie); color: var(--texto);
+}
+.selector input { padding: 0 10px; flex: 1; min-width: 0; }
+.icono { width: 42px; flex: none; font-size: 1.2rem; cursor: pointer; }
+.texto { padding: 0 14px; flex: none; font-weight: 500; cursor: pointer; }
+
+/* ---------- Código ---------- */
+.tarjeta {
+  background: var(--superficie); border: 1px solid var(--linea); border-radius: 16px;
+  padding: 22px 12px 14px; text-align: center;
+}
+.codigo {
+  display: flex; flex-wrap: nowrap; justify-content: center; gap: 0 .32em;
+  margin: 0; cursor: copy; user-select: all;
+  font-size: clamp(1.75rem, 8.6vw, 2.6rem); font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: .02em; color: var(--negro);
+}
+.codigo span { padding-bottom: 7px; border-bottom: 3px solid var(--rojo-logo); }
+.codigo span:last-child { border-bottom-color: var(--negro); }
+.pista { margin: 12px 0 0; font-size: .82rem; color: var(--suave); }
+.aviso { color: var(--rojo); font-weight: 600; margin: 10px 0 0; text-align: center; }
+.aviso[hidden] { display: none; }
+
+/* ---------- Botones ---------- */
+.acciones { display: grid; gap: 10px; margin-top: 22px; }
+.btn {
+  font: inherit; font-size: 1.05rem; font-weight: 700;
+  height: 56px; border-radius: 14px; border: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn[hidden] { display: none; }
+.btn.primario { background: var(--rojo); color: #FFFFFF; }
+.btn.primario:active { background: var(--rojo-activo); }
+.btn.primario:disabled { opacity: .6; }
+.chip {
+  width: 32px; height: 32px; border-radius: 9px; background: #FFFFFF;
+  display: grid; place-items: center; flex: none;
+}
+.chip img { width: 26px; height: 26px; display: block; }
+.btn.whatsapp { background: var(--verde-wa); color: var(--tinta-wa); }
+.btn.whatsapp:active { background: var(--verde-wa-activo); }
+.wa { width: 26px; height: 26px; flex: none; }
+.btn.secundario { background: var(--fondo); color: var(--texto); border: 1px solid var(--linea); }
+.estado { min-height: 1.5em; margin: 12px 0 0; color: var(--ok); font-weight: 500; text-align: center; }
+
+button:focus-visible, input:focus-visible { outline: 3px solid var(--rojo-logo); outline-offset: 2px; }
+
+/* ---------- Pie ---------- */
+.pie {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px 18px; color: var(--suave); font-size: .78rem;
+}
+.pie img { height: 22px; width: auto; display: block; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .codigo.nuevo span { animation: aparecer .3s ease-out; }
+  @keyframes aparecer { from { opacity: .2; } to { opacity: 1; } }
+}
