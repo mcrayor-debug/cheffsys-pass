@@ -13,21 +13,26 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body data-vista="cargando">
 <header class="portada">
-  <div class="banner" role="img" aria-label="Punto de venta CheffSys"></div>
+  <div class="banner" aria-hidden="true"></div>
   <button class="salir" id="salir" hidden>Cerrar sesión</button>
   <div class="identidad">
-    <img class="marca" src="img/cheffsys-marca.png" alt="" width="96" height="96">
+    <img class="marca" src="img/cheffsys-marca.png" alt="" width="88" height="88">
     <div class="titulos">
-      <img class="logo" src="img/cheffsys-texto.png" alt="CheffSys" width="134" height="34">
-      <p class="sub">Contraseña del día</p>
+      <img class="logo" src="img/cheffsys-texto.png" alt="CheffSys" width="104" height="26">
+      <p class="sub" id="subtitulo">Contraseña del día</p>
     </div>
   </div>
 </header>
+
+<nav class="pestanas" id="pestanas" hidden aria-label="Secciones">
+  <button class="pestana activa" data-ir="pass" aria-current="page">Contraseña</button>
+  <button class="pestana" data-ir="config">Configuración</button>
+</nav>
 
 <main>
   <!-- Cargando -->
@@ -38,7 +43,7 @@
   <!-- Inicio de sesión -->
   <section id="vista-login" class="vista" hidden>
     <h1>Inicia sesión</h1>
-    <p class="nota">Usa tu usuario de HIXSA.</p>
+    <p class="nota">Usa el usuario que te asignó tu administrador.</p>
     <form id="form-login" novalidate>
       <label for="email">Correo</label>
       <input id="email" type="email" autocomplete="username" inputmode="email" required>
@@ -49,7 +54,7 @@
     </form>
   </section>
 
-  <!-- Contraseña -->
+  <!-- Contraseña del día -->
   <section id="vista-pass" class="vista" hidden>
     <p class="fecha" id="fecha"></p>
 
@@ -72,6 +77,44 @@
       <button class="btn secundario" id="compartir" hidden>Compartir…</button>
     </div>
     <p class="estado" id="estado" role="status"></p>
+    <button class="enlace" id="cambiar-mi-pass">Cambiar mi contraseña</button>
+  </section>
+
+  <!-- Configuración (solo admin) -->
+  <section id="vista-config" class="vista" hidden>
+    <div class="subpestanas" role="tablist">
+      <button class="subpestana activa" role="tab" data-panel="usuarios" aria-selected="true">Usuarios</button>
+      <button class="subpestana" role="tab" data-panel="log" aria-selected="false">Log</button>
+    </div>
+
+    <div id="panel-usuarios" class="panel">
+      <div class="barra-panel">
+        <p class="conteo" id="conteo-usuarios"></p>
+        <button class="btn primario chico" id="nuevo-usuario">+ Nuevo usuario</button>
+      </div>
+      <ul class="lista-usuarios" id="lista-usuarios"></ul>
+    </div>
+
+    <div id="panel-log" class="panel" hidden>
+      <div class="filtros">
+        <label>Tipo
+          <select id="log-tipo">
+            <option value="pass">Contraseña</option>
+            <option value="admin">Usuarios</option>
+          </select>
+        </label>
+        <label>Periodo
+          <select id="log-dias">
+            <option value="1">Últimas 24 h</option>
+            <option value="7" selected>7 días</option>
+            <option value="30">30 días</option>
+          </select>
+        </label>
+      </div>
+      <ul class="lista-log" id="lista-log"></ul>
+      <button class="btn secundario chico" id="log-mas" hidden>Cargar más</button>
+    </div>
+    <p class="estado" id="estado-config" role="status"></p>
   </section>
 </main>
 
@@ -79,6 +122,74 @@
   <span>Powered by</span>
   <img src="img/logo-hixsa.webp" alt="HIXSA" width="67" height="24">
 </footer>
+
+<!-- Editor de usuario -->
+<dialog id="editor" class="hoja">
+  <form id="form-usuario" method="dialog" novalidate>
+    <div class="hoja-cabeza">
+      <h2 id="editor-titulo">Nuevo usuario</h2>
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar">×</button>
+    </div>
+    <div class="foto-editor">
+      <div class="avatar grande" id="editor-avatar"></div>
+      <div class="foto-botones">
+        <label class="btn secundario chico archivo">Elegir foto
+          <input type="file" id="editor-foto" accept="image/*" hidden>
+        </label>
+        <button type="button" class="enlace" id="editor-quitar-foto" hidden>Quitar foto</button>
+      </div>
+    </div>
+    <label for="u-nombre">Nombre</label>
+    <input id="u-nombre" required maxlength="80" autocomplete="off">
+    <label for="u-email">Correo</label>
+    <input id="u-email" type="email" inputmode="email" required autocomplete="off">
+    <label for="u-celular">Celular</label>
+    <input id="u-celular" type="tel" inputmode="tel" placeholder="10 dígitos" autocomplete="off">
+    <label for="u-rol">Rol</label>
+    <select id="u-rol">
+      <option value="soporte">Soporte · solo la contraseña de hoy</option>
+      <option value="admin">Administrador · todas las fechas y Configuración</option>
+    </select>
+    <p class="error" id="editor-error" role="alert"></p>
+    <button type="submit" class="btn primario" id="editor-guardar">Guardar</button>
+    <div class="acciones-edicion" id="acciones-edicion" hidden>
+      <button type="button" class="btn secundario chico" id="editor-password">Nueva contraseña</button>
+      <button type="button" class="btn secundario chico" id="editor-estado">Dar de baja</button>
+      <button type="button" class="btn peligro chico" id="editor-eliminar">Eliminar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Contraseña temporal -->
+<dialog id="dialogo-temporal" class="hoja">
+  <div class="hoja-cabeza">
+    <h2>Contraseña temporal</h2>
+    <button type="button" class="cerrar" data-cerrar aria-label="Cerrar">×</button>
+  </div>
+  <p class="nota" id="temporal-texto"></p>
+  <p class="temporal" id="temporal-valor"></p>
+  <p class="nota">Solo se muestra esta vez. Entrégala por un canal privado.</p>
+  <div class="acciones">
+    <button type="button" class="btn primario" id="temporal-copiar">Copiar</button>
+    <button type="button" class="btn whatsapp" id="temporal-whatsapp">Enviar por WhatsApp a su celular</button>
+  </div>
+</dialog>
+
+<!-- Cambiar mi contraseña -->
+<dialog id="dialogo-mi-pass" class="hoja">
+  <form id="form-mi-pass" method="dialog" novalidate>
+    <div class="hoja-cabeza">
+      <h2>Cambiar mi contraseña</h2>
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar">×</button>
+    </div>
+    <label for="mi-pass-1">Nueva contraseña</label>
+    <input id="mi-pass-1" type="password" autocomplete="new-password" minlength="8" required>
+    <label for="mi-pass-2">Confírmala</label>
+    <input id="mi-pass-2" type="password" autocomplete="new-password" minlength="8" required>
+    <p class="error" id="mi-pass-error" role="alert"></p>
+    <button type="submit" class="btn primario">Guardar</button>
+  </form>
+</dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>

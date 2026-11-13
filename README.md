@@ -12,7 +12,9 @@ Powered by HIXSA. Uso interno.
 |---|---|---|
 | Frontend | Cloudflare Worker `cheffsys-pass` (estáticos de `public/`), vinculado a GitHub | Login, contraseña, copiar, WhatsApp, compartir |
 | Edge Function | Supabase `CheffsysPass` → `pass-del-dia` | Valida sesión y rol, calcula la contraseña, registra bitácora |
-| Base de datos | Supabase `CheffsysPass` → `perfiles`, `bitacora_pass` | Usuarios, roles y auditoría |
+| Edge Function | Supabase `CheffsysPass` → `admin-usuarios` | Configuración: alta, edición, baja, eliminación, contraseñas temporales y log (solo admin) |
+| Base de datos | Supabase `CheffsysPass` → `perfiles`, `bitacora_pass`, `bitacora_admin` | Usuarios, roles y auditoría |
+| Almacenamiento | Supabase `CheffsysPass` → bucket privado `fotos` | Fotos de usuario (URLs firmadas de 1 h) |
 | Código | GitHub `cheffsys-pass` | Repositorio; Action que prueba y despliega la función |
 
 - La **fórmula vive solo en el servidor** (`supabase/functions/pass-del-dia/formula.ts`).
@@ -30,30 +32,32 @@ public/                          → Cloudflare (estáticos)
   img/                           → logotipos, íconos y banner
 supabase/
   migrations/20261111_cheffsys_pass_inicial.sql   (ya aplicada)
+  migrations/20261113_usuarios_config_y_log.sql    (ya aplicada)
   functions/pass-del-dia/        → index.ts, formula.ts, formula_test.ts
+  functions/admin-usuarios/      → index.ts
 .github/workflows/deploy-edge-function.yml
 docs/                            → guía de despliegue (PDF y Word)
 wrangler.jsonc
 ```
 
-## Estado (11 nov 2026)
+## Estado (13 nov 2026)
 
 | Elemento | Estado |
 |---|---|
-| Esquema en Supabase `CheffsysPass` | Aplicado |
-| Edge Function `pass-del-dia` | Desplegada (v1, `verify_jwt` desactivado: valida por su cuenta) |
-| `public/config.js` | Configurado con la URL y la llave publishable |
-| Secret `PASS_ALLOWED_ORIGINS` | **Pendiente** (sin él la función acepta cualquier origen) |
-| Registro público de usuarios | **Pendiente desactivar** (Authentication → Sign In / Providers) |
-| Primer usuario admin | **Pendiente** |
-| Push a GitHub → despliegue en Cloudflare | **Pendiente** |
+| Esquema, bucket `fotos` y bitácoras en `CheffsysPass` | Aplicado |
+| Edge Functions `pass-del-dia` y `admin-usuarios` | Desplegadas |
+| App en `https://cheffsys-pass.mcrayor.workers.dev` | Publicada |
+| Dominio propio (`pass.cheffsys.com` sugerido) | Pendiente — ver guía, sección «Dominio propio» |
 
 ## Usuarios
+
+Se administran en la app: pestaña **Configuración → Usuarios** (solo rol admin). Alta con foto, correo y celular; edición; baja (bloquea el inicio de sesión); eliminación; contraseña temporal con envío por WhatsApp. Cada cambio queda en **Configuración → Log**.
+
+Solo el **primer** administrador se crea desde Supabase:
 
 ```sql
 -- Tras crear el usuario en Authentication → Users → Add user (se crea su perfil con rol soporte):
 update public.perfiles set rol = 'admin', nombre = 'Nombre Apellido' where email = 'correo@empresa.com';
-update public.perfiles set activo = false where email = 'correo@empresa.com';   -- quitar acceso
 
 -- Bitácora últimos 7 días
 select created_at at time zone 'America/Mexico_City' as hora, usuario_email, fecha_pass, accion

@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
 
   if (p.accion === "obtener" || !p.accion) {
     await registrar("consulta");
-    return json({ fecha, hoy, password: segmentos.join(""), segmentos, puede_cambiar_fecha: otrasFechas, usuario: yo.nombre });
+    return json({ fecha, hoy, password: segmentos.join(""), segmentos, puede_cambiar_fecha: otrasFechas, usuario: yo.nombre, rol: yo.rol });
   }
 
   if (p.accion === "evento") {
